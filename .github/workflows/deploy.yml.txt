@@ -23,4 +23,4 @@ jobs:
 
       - name: Deploy
         run: |
-          rsync -avz --delete ./ deployer@203.194.115.4:/var/www/html/
+            rsync -avz --delete --exclude='.git' ./ root@203.194.115.4:/var/www/html/
