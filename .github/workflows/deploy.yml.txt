@@ -21,6 +21,6 @@ jobs:
         env:
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Deploy
+      - name: Deploy to VPS
         run: |
-            rsync -avz --delete --exclude='.git' ./ root@203.194.115.4:/var/www/html/
+          rsync -avz --delete ./ root@203.194.115.4:/var/www/html/
