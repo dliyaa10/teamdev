@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup SSH
+      - name: Debug SSH Key
         env:
           SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
