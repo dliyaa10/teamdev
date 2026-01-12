@@ -1,12 +1,11 @@
-name: CI Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,6 +14,19 @@ jobs:
 
       - name: Run basic CI check
         run: |
-          echo "CI pipeline running..."
+          echo " CI: Files checked successfully"
           ls -la
-          echo "CI pipeline success"
+
+      - name: Setup SSH for CD
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p 22 203.194.115.4 >> ~/.ssh/known_hosts
+        env:
+          SSH_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to VPS (CD)
+        run: |
+          rsync -avz --delete --exclude='.git' ./ deployer@203.194.115.4:/var/www/html/
+          echo " CD: Website deployed to VPS!"
