@@ -1,20 +1,26 @@
-name: CI Pipeline
+name: Deploy to VPS
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run basic CI check
+      - name: Setup SSH key
         run: |
-          echo "CI pipeline running..."
-          ls -la
-          echo "CI pipeline success"
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -p 22 203.194.115.4 >> ~/.ssh/known_hosts
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy files to VPS
+        run: |
+          rsync -avz --delete --exclude='.git' ./ deployer@203.194.115.4:/var/www/html/
